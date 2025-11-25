@@ -8,7 +8,6 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// ROTA TESTE PARA SABER SE CONECTOU AO BANCO
 app.get('/test-db', async (req, res) => {
     try {
         const [rows] = await pool.query('SELECT 1');
@@ -22,7 +21,6 @@ app.get('/test-db', async (req, res) => {
     }
 });
 
-// ROTA GET: Carregar todos os depoimentos
 app.get('/api/depoimentos', async (req, res) => {
     try {
         const [rows] = await pool.query(
@@ -35,7 +33,6 @@ app.get('/api/depoimentos', async (req, res) => {
     }
 });
 
-// ROTA POST: Salvar um novo depoimento
 app.post('/api/depoimentos', async (req, res) => {
     const { nome, texto } = req.body;
 
@@ -54,7 +51,6 @@ app.post('/api/depoimentos', async (req, res) => {
     }
 });
 
-// Inicia o servidor
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
