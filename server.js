@@ -3,15 +3,28 @@ const cors = require('cors');
 const pool = require('./db');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
+// ROTA TESTE PARA SABER SE CONECTOU AO BANCO
+app.get('/test-db', async (req, res) => {
+    try {
+        const [rows] = await pool.query('SELECT 1');
+        res.json({ 
+            message: "Conectado ao MySQL com sucesso!",
+            result: rows 
+        });
+    } catch (error) {
+        console.error("Erro ao conectar no MySQL:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // ROTA GET: Carregar todos os depoimentos
 app.get('/api/depoimentos', async (req, res) => {
     try {
-        // Renomeamos a coluna para 'data' para garantir que o frontend receba o nome esperado
         const [rows] = await pool.query(
             'SELECT id, nome, texto, data_criacao AS data FROM depoimentos ORDER BY data_criacao DESC'
         );
@@ -31,9 +44,7 @@ app.post('/api/depoimentos', async (req, res) => {
     }
 
     try {
-        // Deixamos o MySQL gerenciar o timestamp usando NOW() para máxima precisão
         const query = 'INSERT INTO depoimentos (nome, texto, data_criacao) VALUES (?, ?, NOW())';
-        
         await pool.query(query, [nome, texto]);
 
         res.status(201).json({ message: 'Depoimento salvo com sucesso!', nome, texto });
@@ -45,6 +56,5 @@ app.post('/api/depoimentos', async (req, res) => {
 
 // Inicia o servidor
 app.listen(PORT, () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
-    console.log('API pronta para receber requisições...');
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
